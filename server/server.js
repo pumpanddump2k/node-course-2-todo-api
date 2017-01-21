@@ -4,7 +4,7 @@ var bodyParser = require('body-parser'); //allows to send JSON to a server.
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
-
+const {ObjectID} = require('mongodb');
 
 var app = express();
 
@@ -28,6 +28,29 @@ app.get('/todos', (req,res) => {
   });
 });
 
+
+//GET /todos/1235566
+app.get('/todos/:id', (req,res) => {
+  var id = req.params.id;
+
+  //validate id to make sure its a valid id using isValid
+    //not valid 404 - send back empty
+
+  if (!ObjectID.isValid(id)) {
+      return res.status(404).send();
+  };
+
+  Todo.findById(id).then((todo) => {
+    if (!todo) {return res.status(404).send();}
+    res.send({todo});
+  }).catch((e) => res.status(400).send());
+
+    //findById
+    //success - if todo - send it back
+    // if no todo - send back 404 with empty body
+    //error - send back 400 and send back nothing
+
+});
 
 app.listen(3000, () => {
   console.log('Started on port 3000');
